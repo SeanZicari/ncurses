@@ -51,11 +51,6 @@ void main(int argc, char * argv[])
         printw("\n");
     }
 
-    printw("%30s: ", "Size of alternative char");
-    printw("%u\n", sizeof(ACS_NEQUAL));
-    printw("%30s: ", "Size of int");
-    printw("%u\n", sizeof(int));
-
     refresh();
     getch();
     endwin();
