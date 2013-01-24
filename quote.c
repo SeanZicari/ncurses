@@ -2,20 +2,21 @@
 #include <ncurses.h>
 #include <signal.h>
 
-void init_screen();
 void init_curses();
 void print_main_menu();
 void handle_terminal_resize(int issued_signal);
+void set_up_resize_handler();
 
 int main()
 {
     int input;
 
     /* Initialization */
-    init_screen();
+    init_curses();
+    print_main_menu();
 
     /* Handle terminal resizing */
-    signal(SIGWINCH, handle_terminal_resize);
+    set_up_resize_handler();
 
     /* The main event loop */
     while ((input = getch()) != 'q' && input != 'Q')
@@ -48,17 +49,27 @@ void init_curses()
 
 void print_main_menu()
 {
-    mvprintw(LINES - 3, 0, "Press <R> to get another quote.");
-    mvchgat(LINES - 3, 7, 1, A_BOLD, 1, NULL);
-    mvprintw(LINES - 2, 0, "Press <Q> to quit.");
-    mvchgat(LINES - 2, 7, 1, A_BOLD, 2, NULL);
+    int y, x;
+
+    getmaxyx(stdscr, y, x);
+    mvprintw(0, 0, "Max y: %d, max x: %d.", y, x);
+
+    mvprintw(y - 3, 0, "Press <R> to get another quote.");
+    mvchgat(y - 3, 7, 1, A_BOLD, 1, NULL);
+    mvprintw(y - 2, 0, "Press <Q> to quit.");
+    mvchgat(y - 2, 7, 1, A_BOLD, 2, NULL);
+
     refresh();
 }
 
-void init_screen()
+void set_up_resize_handler()
 {
-    init_curses();
-    print_main_menu();
+    struct sigaction sig_int_handler;
+
+    sig_int_handler.sa_handler = &handle_terminal_resize;
+    sigemptyset(&sig_int_handler.sa_mask);
+    sig_int_handler.sa_flags = 0;
+    sigaction(SIGWINCH, &sig_int_handler, NULL);
 }
 
 void handle_terminal_resize(int issued_signal)
