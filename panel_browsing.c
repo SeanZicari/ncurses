@@ -7,17 +7,15 @@
 #define NLINES 10
 #define NCOLS 40
 
-void init_wins(WINDOW * wins[], size_t n);
-void win_show(WINDOW * win, char * label, int label_color);
-void print_in_middle(WINDOW * win, int starty, int startx, int width, char * string, chtype color);
+#include "curses_tutorials.h"
 
 int main(int argc, char * argv[])
 {
-    WINDOW * my_wins[3];
-    PANEL  * my_panels[3];
-    PANEL  * top;
-    int      ch, i;
-    size_t   my_wins_size = sizeof my_wins / sizeof(my_wins[0]);
+    WINDOW *my_wins[3];
+    PANEL  *my_panels[3];
+    PANEL  *top;
+    int     ch, i;
+    size_t  my_wins_size = sizeof my_wins / sizeof(my_wins[0]);
 
     /* Initialize curses */
     initscr();
@@ -67,65 +65,4 @@ int main(int argc, char * argv[])
     }
     endwin();
     return 0;
-}
-
-/* Put all the windows */
-void init_wins(WINDOW * wins[], size_t n)
-{
-    int  x, y, i;
-    char label[80];
-
-    y = 2;
-    x = 10;
-
-    for (i = 0; i < n; ++i)
-    {
-        wins[i] = newwin(NLINES, NCOLS, y, x);
-        sprintf(label, "Window Number %d", i + 1);
-        win_show(wins[i], label, i + 1);
-        y += 3;
-        x += 7;
-    }
-}
-
-/* Show the window with a border and a label */
-void win_show(WINDOW * win, char * label, int label_color)
-{
-    int startx, starty, height, width;
-
-    getbegyx(win, starty, startx);
-    getmaxyx(win, height, width);
-
-    box(win, 0, 0);
-    mvwaddch(win, 2, 0, ACS_LTEE);
-    mvwhline(win, 2, 1, ACS_HLINE, width - 2);
-    mvwaddch(win, 2, width - 1, ACS_RTEE);
-
-    print_in_middle(win, 1, 0, width, label, COLOR_PAIR(label_color));
-}
-
-void print_in_middle(WINDOW * win, int starty, int startx, int width, char * string, chtype color)
-{
-    int   length, x, y;
-    float temp;
-
-    if (win == NULL)
-        win = stdscr;
-
-    getyx(win, y, x);
-
-    if (startx != 0)
-        x = startx;
-    if (starty != 0)
-        y = starty;
-    if (width == 0)
-        width = 80;
-
-    length = strlen(string);
-    temp = (width - length) / 2;
-    x = startx + (int)temp;
-    wattron(win, color);
-    mvwprintw(win, y, x, "%s", string);
-    wattroff(win, color);
-    refresh();
 }
