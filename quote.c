@@ -6,11 +6,10 @@ void init_curses();
 void print_main_menu();
 void handle_terminal_resize(int issued_signal);
 void set_up_resize_handler();
+void main_loop();
 
 int main()
 {
-    int input;
-
     /* Initialization */
     init_curses();
     print_main_menu();
@@ -19,6 +18,17 @@ int main()
     set_up_resize_handler();
 
     /* The main event loop */
+    main_loop();
+
+    /* We're done */
+    endwin();
+    return 0;
+}
+
+void main_loop()
+{
+    int input;
+
     while ((input = getch()) != 'q' && input != 'Q')
     {
         switch (input)
@@ -30,10 +40,6 @@ int main()
                 break;
         }
     }
-
-    /* We're done */
-    endwin();
-    return 0;
 }
 
 void init_curses()
