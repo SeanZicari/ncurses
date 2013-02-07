@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <signal.h>
+#include <string.h>
 
 void init_curses();
 void print_main_menu();
