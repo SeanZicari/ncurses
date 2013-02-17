@@ -5,28 +5,35 @@
 
 void init_curses();
 void print_main_menu();
+void display_ui(WINDOW *);
 void handle_terminal_resize(int issued_signal);
 void set_up_resize_handler();
-void main_loop();
+void main_loop(WINDOW *);
 
 int main()
 {
+    WINDOW * quote_window = NULL;
+
     /* Initialization */
     init_curses();
-    print_main_menu();
+    //print_main_menu();
+
+    display_ui(quote_window);
 
     /* Handle terminal resizing */
     set_up_resize_handler();
 
+    refresh();
+
     /* The main event loop */
-    main_loop();
+    main_loop(quote_window);
 
     /* We're done */
     endwin();
     return 0;
 }
 
-void main_loop()
+void main_loop(WINDOW * quote_window)
 {
     int input;
 
@@ -49,7 +56,10 @@ void init_curses()
     cbreak();
     noecho();
     curs_set(0); // Hide the cursor
-    start_color();
+
+    if (has_colors())
+        start_color();
+
     init_pair(1, COLOR_GREEN, COLOR_BLACK);
     init_pair(2, COLOR_RED, COLOR_BLACK);
 }
@@ -67,6 +77,19 @@ void print_main_menu()
     mvchgat(y - 2, 7, 1, A_BOLD, 2, NULL);
 
     refresh();
+}
+
+void display_ui(WINDOW * quote_window)
+{
+    int max_y, max_x;
+
+    getmaxyx(stdscr, max_y, max_x);
+
+    /* Create the window where the quotes will be displayed */
+    quote_window = newwin(25, max_x, 2, 1);
+    box(quote_window, 0, 0);
+
+    wrefresh(quote_window);
 }
 
 void set_up_resize_handler()
